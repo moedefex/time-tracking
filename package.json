@@ -1,0 +1,17 @@
+{
+  "name": "time-tracking",
+  "version": "1.0.0",
+  "description": "A time tracking API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mauricio Restrepo De Fex",
+  "license": "ISC",
+  "dependencies": {
+    "claudia-api-builder": "^4.1.1"
+  },
+  "optionalDependencies": {
+    "aws-sdk": "^2.387.0"
+  }
+}

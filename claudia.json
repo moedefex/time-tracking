@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "time-tracking-executor",
+    "name": "time-tracking",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "wfkbv606a0",
+    "module": "index"
+  }
+}
