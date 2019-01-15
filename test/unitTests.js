@@ -116,7 +116,7 @@ describe('Time entries test', function () {
         });
     });
     it('Should be able to update a time entry for only project_id, stop, duration, description and task_id', function (done) {
-        TimeEntries.createTimeEntry(
+        TimeEntries.updateTimeEntryById(
             {
                 requestContext: {
                     resourcePath: '/v1/time-entries/{id}',
@@ -132,12 +132,12 @@ describe('Time entries test', function () {
                     "project_id": null
                 },
                 pathParams: {
-                    id: '8fc93e10-8543-4b12-aa82-79a0f5d968f2'
+                    id: "699ad042-df9e-4ea1-8df9-ac2eaebde55e"
                 }
             }
         )
         .then(result => {
-            expect(result).to.be.empty;
+            expect(result).to.be.undefined;
             return done();
         })
         .catch(error => {
