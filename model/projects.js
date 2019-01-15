@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk');
 const UUID = require('uuid/v4');
+AWS.config.update({region:'us-east-1'});
 
 let dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -38,17 +39,24 @@ const getAllProjects = (request) => {
 }
 
 /**
- * GET the specified project information
+ * GET the specified user time entries sorted by the most recent
  * 
  * @param {Object} request 
  */
-const getProjectById = (request) => {
-    return dynamoDb.scan({ TableName: 'projects' }).promise()
-        .then(response => response.Items);
+const getProjectsByUserId = (request) => {
+    var params = {
+        IndexName: 'user_id-index',
+        KeyConditionExpression: "user_id = :uid",
+        TableName: 'projects',
+        ExpressionAttributeValues: {
+            ":uid": request.pathParams.id,
+        }
+    };
+    return dynamoDb.query(params).promise().then(response => response.Items);
 }
 
 module.exports = {
     createProject,
-    getProjectById,
+    getProjectsByUserId,
     getAllProjects
 }

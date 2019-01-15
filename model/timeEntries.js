@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk');
 const UUID = require('uuid/v4');
+AWS.config.update({ region: 'us-east-1' });
 
 let dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -25,7 +26,7 @@ const getAllTimeEntries = (request) => {
  * 
  * @param {Object} request 
  */
-const getTimeEntryById = (request) => {
+const getTimeEntriesByUserId = (request) => {
     var params = {
         TableName: 'time-entries',
         ScanIndexForward: false,
@@ -51,16 +52,21 @@ const getTimeEntryById = (request) => {
  * @param {Object} request 
  */
 const createTimeEntry = (request) => {
+    var duration = null;
     if (request.body.start == null || request.body.start === "")
         throw Error('{"error":"A start date must be specified"}');
     if (request.body.user_id == null || request.body.user_id === "")
         throw Error('{"error":"A user id be must be specified"}');
+    if ((request.body.duration == null && request.body.stop != null)
+        || (request.body.stop == null && request.body.duration != null))
+        throw Error('{"error":"You must specify both stop time and duration or neither"}');
+
     var params = {
         TableName: 'time-entries',
         Item: {
             id: UUID(),
             description: request.body.description, // task description, can be null
-            start_time: new Date(request.body.start).getTime(), //The date is transformed to a number
+            start_time: new Date(request.body.start).getTime(), //The date is transformed to a number as a sorting method
             start: request.body.start,
             stop: request.body.stop,
             duration: request.body.duration,
@@ -83,17 +89,21 @@ const createTimeEntry = (request) => {
  * @param {Object} request 
  */
 const updateTimeEntryById = (request) => {
-    if (request.pathParams.id === null || request.pathParams.id === "")
+    if (request.pathParams.id == null || request.pathParams.id === "")
         throw Error('{"error":"A time entry id be must be specified"}');
+    if ((request.body.duration == null && request.body.stop != null)
+        || (request.body.stop == null && request.body.duration != null))
+        throw Error('{"error":"You must specify both stop time and duration or neither"}');
     var params = {
         TableName: "time-entries",
         Key: {
             "id": request.pathParams.id
         },
-        UpdateExpression: "set description = :d, stop=:s, task_id=:t, project_id=:p",
+        UpdateExpression: "set description = :d, stop=:s, duration=:du, task_id=:t, project_id=:p",
         ExpressionAttributeValues: {
             ":d": request.body.description,
             ":s": request.body.stop,
+            ":du": request.body.duration,
             ":t": request.body.task_id,
             ":p": request.body.project_id
         },
@@ -104,7 +114,7 @@ const updateTimeEntryById = (request) => {
 
 module.exports = {
     getAllTimeEntries,
-    getTimeEntryById,
+    getTimeEntriesByUserId,
     createTimeEntry,
     updateTimeEntryById
 }
