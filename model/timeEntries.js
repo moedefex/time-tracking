@@ -52,7 +52,6 @@ const getTimeEntriesByUserId = (request) => {
  * @param {Object} request 
  */
 const createTimeEntry = (request) => {
-    var duration = null;
     if (request.body.start == null || request.body.start === "")
         throw Error('{"error":"A start date must be specified"}');
     if (request.body.user_id == null || request.body.user_id === "")
@@ -99,13 +98,16 @@ const updateTimeEntryById = (request) => {
         Key: {
             "id": request.pathParams.id
         },
-        UpdateExpression: "set description = :d, stop=:s, duration=:du, task_id=:t, project_id=:p",
+        UpdateExpression: "set description = :d, stop=:s, #dt=:du, task_id=:t, project_id=:p",
         ExpressionAttributeValues: {
             ":d": request.body.description,
             ":s": request.body.stop,
             ":du": request.body.duration,
             ":t": request.body.task_id,
             ":p": request.body.project_id
+        },
+        ExpressionAttributeNames: {
+            "#dt": "duration"
         },
         ReturnValues: "UPDATED_NEW"
     };
